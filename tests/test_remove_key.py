@@ -31,11 +31,20 @@ def test_remove_client_deletes_entry(tmp_path) -> None:
     assert not clients
 
 
-def test_reload_xray_uses_subprocess() -> None:
+def test_reload_xray_uses_subprocess(monkeypatch) -> None:
+    monkeypatch.setattr(xray.shutil, "which", lambda _: "/usr/bin/systemctl")
     with mock.patch("subprocess.run") as run_mock:
         xray.reload_xray()
 
     run_mock.assert_called_once()
+
+
+def test_reload_xray_skips_when_unavailable(monkeypatch) -> None:
+    monkeypatch.setattr(xray.shutil, "which", lambda _: None)
+    with mock.patch("subprocess.run") as run_mock:
+        xray.reload_xray()
+
+    run_mock.assert_not_called()
 
 
 def test_remove_client_returns_false(tmp_path) -> None:

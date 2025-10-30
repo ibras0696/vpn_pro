@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import json
+import shlex
+import shutil
 import subprocess
 from io import BytesIO
 from pathlib import Path
 from typing import Any, Sequence
 
 import qrcode
+from loguru import logger
 
 from app.config import get_settings
 
@@ -87,6 +90,17 @@ def remove_client(uuid: str, config_path: str | Path) -> bool:
     return True
 
 
+def _resolve_reload_command(command: Sequence[str] | None = None) -> list[str]:
+    if command:
+        return list(command)
+
+    settings = get_settings()
+    if settings.xray_reload_command:
+        return shlex.split(settings.xray_reload_command)
+
+    return ["systemctl", "reload", "xray"]
+
+
 def reload_xray(command: Sequence[str] | None = None) -> None:
     """Перезагрузить службу XRay.
 
@@ -94,11 +108,20 @@ def reload_xray(command: Sequence[str] | None = None) -> None:
         command (Sequence[str] | None): Команда для перезагрузки (по умолчанию systemctl reload xray).
 
     Возвращает:
-        None: Возбуждает исключение при ошибке выполнения команды.
+        None
     """
 
-    cmd = list(command or ("systemctl", "reload", "xray"))
-    subprocess.run(cmd, check=True)
+    cmd = _resolve_reload_command(command)
+    executable = cmd[0]
+
+    if shutil.which(executable) is None:
+        logger.warning("Команда перезагрузки XRay недоступна: %s", executable)
+        return
+
+    try:
+        subprocess.run(cmd, check=True)
+    except FileNotFoundError:
+        logger.warning("Не удалось выполнить команду перезагрузки XRay: %s", cmd)
 
 
 def generate_qr_code(link: str) -> BytesIO:
@@ -124,4 +147,3 @@ __all__ = [
     "reload_xray",
     "generate_qr_code",
 ]
-
