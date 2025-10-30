@@ -1,4 +1,4 @@
-# version: "3.9"
+version: "3.9"
 
 services:
   db:
@@ -27,6 +27,7 @@ services:
     command: ["python", "-m", "app.bot.main"]
     volumes:
       - .:/app
+      - ./docker/xray/config.json:/app/xray/config.json
 
 volumes:
   postgres_data:
