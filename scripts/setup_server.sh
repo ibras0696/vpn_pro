@@ -10,6 +10,27 @@ if [[ "${EUID}" -ne 0 ]]; then
   SUDO="sudo"
 fi
 
+pull_with_retry() {
+  local image="$1"
+  local attempts=0
+  local max_attempts=3
+  local delay=5
+
+  while (( attempts < max_attempts )); do
+    if docker pull "$image"; then
+      echo "Образ $image успешно загружен."
+      return 0
+    fi
+    attempts=$((attempts + 1))
+    echo "Не удалось загрузить $image (попытка $attempts из $max_attempts). Повтор через ${delay}s..."
+    sleep "$delay"
+    delay=$((delay * 2))
+  done
+
+  echo "Предупреждение: не удалось загрузить образ $image автоматически." >&2
+  return 1
+}
+
 echo "Обновление пакетов..."
 $SUDO apt-get update -y
 $SUDO apt-get upgrade -y
@@ -45,6 +66,14 @@ if ! command -v docker >/dev/null 2>&1; then
   fi
 else
   echo "Docker уже установлен, пропускаем."
+fi
+
+if command -v docker >/dev/null 2>&1; then
+  echo "Загрузка необходимых Docker-образов..."
+  pull_with_retry "python:3.12-slim" || true
+  pull_with_retry "postgres:16-alpine" || true
+else
+  echo "Docker не установлен. Пропускаю загрузку образов." >&2
 fi
 
 if ! command -v docker compose >/dev/null 2>&1 && ! command -v docker-compose >/dev/null 2>&1; then
