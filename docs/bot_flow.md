@@ -25,7 +25,7 @@
 1. После нажатия «Создать ключ» бот сохраняет заготовку (email `user_<tg_id>@vpn.local`, путь к конфигу) и предлагает выбрать срок действия из вариантов (1/7/30 дней или «без ограничения»).
 2. Выбранное значение конвертируется в `expires_at` (UTC) и сохраняется в in-memory `PENDING_CREATIONS`.
 3. Следующий шаг — выбор ограничения по количеству устройств (1/3/5 или «без ограничения»).
-4. После выбора бот вызывает `services.xray.create_client`, обновляет `docker/xray/config.json`, формирует vless-ссылку и сохраняет запись в БД (`Key` с `expires_at`, `device_limit`).
+4. После выбора бот вызывает `services.xray.create_client`, обновляет `docker/xray/config.json`, формирует vless-ссылку (используя `XRAY_SECURITY`, `XRAY_NETWORK`, `XRAY_SERVICE_NAME`, `XRAY_FLOW`) и сохраняет запись в БД (`Key` с `expires_at`, `device_limit`).
 5. `reload_xray()` вызывается при наличии доступной команды (по умолчанию `systemctl reload xray`, можно переопределить `XRAY_RELOAD_COMMAND`).
 6. Администратор получает:
    - текст «✅ Ключ создан» с информацией о сроке/лимите;

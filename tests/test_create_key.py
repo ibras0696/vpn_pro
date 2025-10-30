@@ -19,7 +19,14 @@ def test_create_client_updates_config(tmp_path, monkeypatch) -> None:
     monkeypatch.setattr(
         xray,
         "get_settings",
-        lambda: SimpleNamespace(xray_host="vpn.example.com", xray_port=443),
+        lambda: SimpleNamespace(
+            xray_host="vpn.example.com",
+            xray_port=443,
+            xray_security="none",
+            xray_network="tcp",
+            xray_service_name="",
+            xray_flow="",
+        ),
     )
 
     uuid = "123e4567-e89b-12d3-a456-426614174000"
@@ -46,7 +53,14 @@ def test_create_client_duplicate(tmp_path, monkeypatch) -> None:
     monkeypatch.setattr(
         xray,
         "get_settings",
-        lambda: SimpleNamespace(xray_host="vpn.example.com", xray_port=443),
+        lambda: SimpleNamespace(
+            xray_host="vpn.example.com",
+            xray_port=443,
+            xray_security="none",
+            xray_network="tcp",
+            xray_service_name="",
+            xray_flow="",
+        ),
     )
 
     uuid = "123e4567-e89b-12d3-a456-426614174000"

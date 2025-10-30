@@ -282,6 +282,10 @@ async def handle_settings(callback: CallbackQuery) -> None:
         f"• XRAY_CONFIG_PATH: {settings.xray_config_path}\n"
         f"• XRAY_HOST: {settings.xray_host}\n"
         f"• XRAY_PORT: {settings.xray_port}\n"
+        f"• XRAY_SECURITY: {settings.xray_security or 'none'}\n"
+        f"• XRAY_NETWORK: {settings.xray_network or 'tcp'}\n"
+        f"• XRAY_SERVICE_NAME: {settings.xray_service_name or '—'}\n"
+        f"• XRAY_FLOW: {settings.xray_flow or '—'}\n"
         f"• XRAY_RELOAD_COMMAND: {settings.xray_reload_command or 'не задана'}"
     )
     await callback.message.answer(info)

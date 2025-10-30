@@ -207,6 +207,10 @@ def test_handle_settings(monkeypatch) -> None:
             xray_config_path="/app/xray.json",
             xray_host="example.com",
             xray_port=443,
+            xray_security="none",
+            xray_network="tcp",
+            xray_service_name="",
+            xray_flow="",
             xray_reload_command="service xray restart",
         ),
     )

@@ -23,7 +23,7 @@
 - `make setup-server` — обновить систему, установить Docker/Poetry и заранее загрузить базовые образы.
 - `make ubuntu-setup-script` — создать локальный скрипт `ubuntu24_setup.sh` для ручного запуска.
 - `make migrate` — применить SQL-миграции (создание таблиц `users`, `keys`).
-- Отредактируйте `docker/xray/config.json`, чтобы в конфиге присутствовали реальные inbound-параметры XRay.
+- Отредактируйте `docker/xray/config.json`, чтобы в конфиге присутствовали реальные inbound-параметры XRay (подробнее см. `docs/xray_config.md`).
 - При необходимости задайте команду перезагрузки XRay через переменную `XRAY_RELOAD_COMMAND` (например, `service xray restart`).
 
 ### Как запустить скрипт вручную

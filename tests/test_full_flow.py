@@ -21,6 +21,10 @@ def test_full_key_lifecycle(tmp_path, monkeypatch) -> None:
         xray_config_path=str(config_path),
         xray_host="vpn.example.com",
         xray_port=443,
+        xray_security="none",
+        xray_network="tcp",
+        xray_service_name="",
+        xray_flow="",
     )
     monkeypatch.setattr(xray, "get_settings", lambda: settings_stub)
 

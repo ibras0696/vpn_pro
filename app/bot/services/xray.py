@@ -35,6 +35,27 @@ def _get_vless_clients(config: dict[str, Any]) -> list[dict[str, Any]]:
     raise ValueError("В конфиге отсутствует inbound с протоколом vless")
 
 
+def compose_vless_link(uuid: str, email: str) -> str:
+    settings = get_settings()
+
+    params: list[tuple[str, str]] = []
+    if settings.xray_flow:
+        params.append(("flow", settings.xray_flow))
+    if settings.xray_security:
+        params.append(("security", settings.xray_security))
+    if settings.xray_network:
+        params.append(("type", settings.xray_network))
+    if settings.xray_network.lower() == "grpc" and settings.xray_service_name:
+        params.append(("serviceName", settings.xray_service_name))
+
+    query = "&".join(f"{key}={value}" for key, value in params if value)
+
+    base = f"vless://{uuid}@{settings.xray_host}:{settings.xray_port}"
+    if query:
+        base = f"{base}?{query}"
+    return f"{base}#{email}"
+
+
 def create_client(uuid: str, email: str, config_path: str | Path) -> str:
     """Добавить клиента в конфигурацию XRay.
 
@@ -57,12 +78,7 @@ def create_client(uuid: str, email: str, config_path: str | Path) -> str:
     clients.append({"id": uuid, "email": email})
     _save_config(config, path)
 
-    settings = get_settings()
-    return (
-        f"vless://{uuid}@{settings.xray_host}:{settings.xray_port}?"
-        "flow=xtls-rprx-vision&security=tls&type=grpc&serviceName=grpc"
-        f"#{email}"
-    )
+    return compose_vless_link(uuid, email)
 
 
 def remove_client(uuid: str, config_path: str | Path) -> bool:
@@ -146,4 +162,5 @@ __all__ = [
     "remove_client",
     "reload_xray",
     "generate_qr_code",
+    "compose_vless_link",
 ]

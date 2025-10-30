@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     xray_config_path: str = "./docker/xray/config.json"
     xray_host: str = "vpn.example.com"
     xray_port: int = 443
+    xray_security: str = "none"
+    xray_network: str = "tcp"
+    xray_service_name: str = ""
+    xray_flow: str = ""
     xray_reload_command: str = ""
 
 

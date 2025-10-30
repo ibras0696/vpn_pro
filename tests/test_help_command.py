@@ -18,7 +18,14 @@ def test_help_command_returns_text(monkeypatch) -> None:
     monkeypatch.setattr(
         help_handler,
         "get_settings",
-        lambda: SimpleNamespace(xray_host="vpn.example.com", xray_port=443),
+        lambda: SimpleNamespace(
+            xray_host="vpn.example.com",
+            xray_port=443,
+            xray_network="tcp",
+            xray_security="none",
+            xray_service_name="",
+            xray_flow="",
+        ),
     )
 
     asyncio.run(help_handler.cmd_help(message))
