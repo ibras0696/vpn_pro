@@ -1,0 +1,127 @@
+"""Сервисы работы с конфигурацией XRay."""
+
+from __future__ import annotations
+
+import json
+import subprocess
+from io import BytesIO
+from pathlib import Path
+from typing import Any, Sequence
+
+import qrcode
+
+from app.config import get_settings
+
+
+def _load_config(config_path: Path) -> dict[str, Any]:
+    if not config_path.exists():
+        raise FileNotFoundError(f"Конфиг не найден: {config_path}")
+    return json.loads(config_path.read_text(encoding="utf-8"))
+
+
+def _save_config(config: dict[str, Any], config_path: Path) -> None:
+    config_path.write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def _get_vless_clients(config: dict[str, Any]) -> list[dict[str, Any]]:
+    for inbound in config.get("inbounds", []):
+        if inbound.get("protocol") != "vless":
+            continue
+        settings = inbound.setdefault("settings", {})
+        return settings.setdefault("clients", [])
+    raise ValueError("В конфиге отсутствует inbound с протоколом vless")
+
+
+def create_client(uuid: str, email: str, config_path: str | Path) -> str:
+    """Добавить клиента в конфигурацию XRay.
+
+    Аргументы:
+        uuid (str): Уникальный идентификатор клиента.
+        email (str): Комментарий/почта пользователя, который будет записан в конфиге.
+        config_path (str | Path): Путь к файлу config.json.
+
+    Возвращает:
+        str: Сформированная vless-ссылка для подключения.
+    """
+
+    path = Path(config_path)
+    config = _load_config(path)
+    clients = _get_vless_clients(config)
+
+    if any(client.get("id") == uuid for client in clients):
+        raise ValueError("Клиент с таким UUID уже существует")
+
+    clients.append({"id": uuid, "email": email})
+    _save_config(config, path)
+
+    settings = get_settings()
+    return (
+        f"vless://{uuid}@{settings.xray_host}:{settings.xray_port}?"
+        "flow=xtls-rprx-vision&security=tls&type=grpc&serviceName=grpc"
+        f"#{email}"
+    )
+
+
+def remove_client(uuid: str, config_path: str | Path) -> bool:
+    """Удалить клиента по UUID из файла конфигурации.
+
+    Аргументы:
+        uuid (str): Уникальный идентификатор, который нужно удалить.
+        config_path (str | Path): Путь к файлу config.json.
+
+    Возвращает:
+        bool: True если запись была удалена, иначе False.
+    """
+
+    path = Path(config_path)
+    config = _load_config(path)
+    clients = _get_vless_clients(config)
+
+    initial_len = len(clients)
+    clients[:] = [client for client in clients if client.get("id") != uuid]
+
+    if len(clients) == initial_len:
+        return False
+
+    _save_config(config, path)
+    return True
+
+
+def reload_xray(command: Sequence[str] | None = None) -> None:
+    """Перезагрузить службу XRay.
+
+    Аргументы:
+        command (Sequence[str] | None): Команда для перезагрузки (по умолчанию systemctl reload xray).
+
+    Возвращает:
+        None: Возбуждает исключение при ошибке выполнения команды.
+    """
+
+    cmd = list(command or ("systemctl", "reload", "xray"))
+    subprocess.run(cmd, check=True)
+
+
+def generate_qr_code(link: str) -> BytesIO:
+    """Сгенерировать QR-код для vless-ссылки.
+
+    Аргументы:
+        link (str): Ссылка vless://, которую нужно преобразовать.
+
+    Возвращает:
+        BytesIO: Буфер PNG с изображением QR-кода.
+    """
+
+    image = qrcode.make(link)
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    buffer.seek(0)
+    return buffer
+
+
+__all__ = [
+    "create_client",
+    "remove_client",
+    "reload_xray",
+    "generate_qr_code",
+]
+

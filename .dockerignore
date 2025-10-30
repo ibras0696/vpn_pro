@@ -1,0 +1,28 @@
+# Version control
+.git
+.gitignore
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+env/
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Local configuration
+.idea/
+.vscode/
+.env
+
+# Test and documentation directories (mounted when needed)
+tests/
+docs/

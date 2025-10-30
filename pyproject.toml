@@ -1,0 +1,49 @@
+[tool.poetry]
+name = "vpn_proect"
+version = "0.1.0"
+description = "Telegram bot for managing VPN keys with XRay integration"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiogram = "^3.7.0"
+sqlalchemy = { version = "^2.0.29", extras = ["asyncio"] }
+loguru = "^0.7.2"
+psycopg = { version = "^3.1.18", extras = ["binary"] }
+pydantic = "^2.5.3"
+pydantic-settings = "^2.2.1"
+qrcode = "^7.4.2"
+python-dotenv = "^1.0.1"
+aiosqlite = "^0.19.0"
+pillow = "^10.3.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.1"
+pytest-asyncio = "^0.23.6"
+pytest-mock = "^3.12.0"
+coverage = "^7.4.4"
+ruff = "^0.4.4"
+
+[build-system]
+requires = ["poetry-core>=1.7.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-q --disable-warnings"
+
+[tool.coverage.run]
+branch = true
+source = ["app"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-select = ["B", "C4", "I", "Q"]
