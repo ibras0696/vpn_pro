@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{ include = "app" }]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 aiogram = "^3.7.0"
 sqlalchemy = { version = "^2.0.29", extras = ["asyncio"] }
 loguru = "^0.7.2"
@@ -45,5 +45,5 @@ skip_empty = true
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py312"
 extend-select = ["B", "C4", "I", "Q"]

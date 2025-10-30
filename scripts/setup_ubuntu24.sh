@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ "$(lsb_release -is 2>/dev/null || echo Unknown)" != "Ubuntu" ]]; then
-  echo "Скрипт предназначен для Ubuntu 22.x LTS." >&2
+DISTRO="$(lsb_release -is 2>/dev/null || echo Unknown)"
+RELEASE="$(lsb_release -rs 2>/dev/null || echo 0)"
+
+if [[ "${DISTRO}" != "Ubuntu" || "${RELEASE}" != 24.* ]]; then
+  echo "Предупреждение: скрипт рассчитан на Ubuntu 24.x LTS, текущее окружение: ${DISTRO} ${RELEASE}." >&2
 fi
 
 SUDO=""
@@ -74,7 +77,7 @@ fi
 
 if command -v docker >/dev/null 2>&1; then
   echo "Загрузка необходимых Docker-образов..."
-  pull_with_retry "python:3.11-slim" || true
+  pull_with_retry "python:3.12-slim" || true
   if ! pull_with_retry "postgres:16"; then
     echo "Не удалось получить postgres:16, пробуем postgres:latest..."
     pull_with_retry "postgres:latest" || true

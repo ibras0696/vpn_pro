@@ -70,7 +70,7 @@ fi
 
 if command -v docker >/dev/null 2>&1; then
   echo "Загрузка необходимых Docker-образов..."
-  pull_with_retry "python:3.11-slim" || true
+  pull_with_retry "python:3.12-slim" || true
   if ! pull_with_retry "postgres:16"; then
     echo "Не удалось получить postgres:16, пробуем postgres:latest..."
     pull_with_retry "postgres:latest" || true
