@@ -8,15 +8,20 @@ from app.bot import main
 class DummyDispatcher:
     def __init__(self) -> None:
         self.routers: list[object] = []
-        self.middlewares: list[object] = []
+        self.message_middlewares: list[object] = []
+        self.callback_middlewares: list[object] = []
         self.start_polling = AsyncMock()
-        self.update = SimpleNamespace(outer_middleware=self._outer_middleware)
+        self.message = SimpleNamespace(outer_middleware=self._register_message)
+        self.callback_query = SimpleNamespace(outer_middleware=self._register_callback)
 
     def include_router(self, router: object) -> None:
         self.routers.append(router)
 
-    def _outer_middleware(self, middleware: object) -> None:
-        self.middlewares.append(middleware)
+    def _register_message(self, middleware: object) -> None:
+        self.message_middlewares.append(middleware)
+
+    def _register_callback(self, middleware: object) -> None:
+        self.callback_middlewares.append(middleware)
 
 
 class DummyBot:
@@ -40,5 +45,6 @@ def test_main_starts_polling(monkeypatch) -> None:
     asyncio.run(main.main())
 
     assert dispatcher.start_polling.await_count == 1
-    assert dispatcher.middlewares == ["mw:99"]
+    assert dispatcher.message_middlewares == ["mw:99"]
+    assert dispatcher.callback_middlewares == ["mw:99"]
     assert len(dispatcher.routers) >= 2

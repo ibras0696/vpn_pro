@@ -22,7 +22,8 @@ async def main() -> None:
 
     dispatcher.include_router(admin_router)
     dispatcher.include_router(key_router)
-    dispatcher.update.outer_middleware(AdminAccessMiddleware(settings.admin_id))
+    dispatcher.message.outer_middleware(AdminAccessMiddleware(settings.admin_id))
+    dispatcher.callback_query.outer_middleware(AdminAccessMiddleware(settings.admin_id))
 
     logger.info("Запуск бота с ADMIN_ID=%s", settings.admin_id)
     await dispatcher.start_polling(bot)
