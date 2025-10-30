@@ -9,6 +9,7 @@ class DummyMessage:
     def __init__(self, user_id: int) -> None:
         self.from_user = SimpleNamespace(id=user_id)
         self.answers: list[dict[str, object]] = []
+        self.text: str | None = None
 
     async def answer(self, text: str, reply_markup=None) -> None:
         self.answers.append({"text": text, "reply_markup": reply_markup})
@@ -57,3 +58,16 @@ def test_callback_rejection(monkeypatch) -> None:
 
     callback.answer.assert_called_once()
     assert callback.message.answers
+
+
+def test_allowed_command_for_non_admin() -> None:
+    middleware = AdminAccessMiddleware(admin_id=1, allowed_commands={"help"})
+    message = DummyMessage(user_id=999)
+    message.text = "/help"
+    handler = AsyncMock(return_value="ok")
+
+    result = asyncio.run(middleware(handler, message, {}))
+
+    handler.assert_called_once()
+    assert result == "ok"
+    assert not message.answers

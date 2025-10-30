@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS keys (
     uuid VARCHAR(64) UNIQUE NOT NULL,
     email VARCHAR(255) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    expires_at TIMESTAMPTZ
+    expires_at TIMESTAMPTZ,
+    device_limit INTEGER
 );

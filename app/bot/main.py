@@ -8,6 +8,7 @@ from aiogram.enums import ParseMode
 from loguru import logger
 
 from app.bot.handlers.admin import router as admin_router
+from app.bot.handlers.help import router as help_router
 from app.bot.handlers.key_management import router as key_router
 from app.bot.middlewares.admin import AdminAccessMiddleware
 from app.config import get_settings
@@ -20,10 +21,13 @@ async def main() -> None:
     bot = Bot(token=settings.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dispatcher = Dispatcher()
 
+    dispatcher.include_router(help_router)
     dispatcher.include_router(admin_router)
     dispatcher.include_router(key_router)
-    dispatcher.message.outer_middleware(AdminAccessMiddleware(settings.admin_id))
-    dispatcher.callback_query.outer_middleware(AdminAccessMiddleware(settings.admin_id))
+
+    access_middleware = AdminAccessMiddleware(settings.admin_id, allowed_commands={"help"})
+    dispatcher.message.outer_middleware(access_middleware)
+    dispatcher.callback_query.outer_middleware(access_middleware)
 
     logger.info("Запуск бота с ADMIN_ID=%s", settings.admin_id)
     await dispatcher.start_polling(bot)

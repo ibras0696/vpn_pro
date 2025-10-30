@@ -22,6 +22,7 @@
 - `make clean-docker` — остановить и очистить docker-тома.
 - `make setup-server` — обновить систему, установить Docker/Poetry и заранее загрузить базовые образы.
 - `make ubuntu-setup-script` — создать локальный скрипт `ubuntu24_setup.sh` для ручного запуска.
+- `make migrate` — применить SQL-миграции (создание таблиц `users`, `keys`).
 - Отредактируйте `docker/xray/config.json`, чтобы в конфиге присутствовали реальные inbound-параметры XRay.
 - При необходимости задайте команду перезагрузки XRay через переменную `XRAY_RELOAD_COMMAND` (например, `service xray restart`).
 
@@ -35,4 +36,10 @@
 ```bash
 make ubuntu-setup-script
 ./ubuntu24_setup.sh
+```
+
+Применение миграций базы данных:
+
+```bash
+make migrate
 ```

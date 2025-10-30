@@ -5,7 +5,7 @@ DOCKER_COMPOSE ?= docker compose
 PROJECT_ROOT := $(shell pwd)
 UBUNTU_SETUP_OUTPUT ?= ubuntu24_setup.sh
 
-.PHONY: init up down restart ps logs lint fmt test coverage clean clean-docker setup-server ubuntu-setup-script
+.PHONY: init up down restart ps logs lint fmt test coverage clean clean-docker setup-server ubuntu-setup-script migrate
 
 init:
 	@cp -n .env.example .env || true
@@ -53,3 +53,9 @@ ubuntu-setup-script:
 	@cp $(PROJECT_ROOT)/scripts/setup_ubuntu24.sh $(PROJECT_ROOT)/$(UBUNTU_SETUP_OUTPUT)
 	@chmod +x $(PROJECT_ROOT)/$(UBUNTU_SETUP_OUTPUT)
 	@echo "Скрипт сохранён в $(UBUNTU_SETUP_OUTPUT)"
+
+migrate:
+	@echo "Applying database migrations..."
+	$(DOCKER_COMPOSE) exec db psql -U postgres -d vpn_project -c "CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, tg_id BIGINT UNIQUE NOT NULL, is_admin BOOLEAN DEFAULT FALSE);"
+	$(DOCKER_COMPOSE) exec db psql -U postgres -d vpn_project -c "CREATE TABLE IF NOT EXISTS keys (id SERIAL PRIMARY KEY, uuid VARCHAR(64) UNIQUE NOT NULL, email VARCHAR(255) NOT NULL, created_at TIMESTAMPTZ DEFAULT NOW(), expires_at TIMESTAMPTZ, device_limit INTEGER);"
+	$(DOCKER_COMPOSE) exec db psql -U postgres -d vpn_project -c "ALTER TABLE IF EXISTS keys ADD COLUMN IF NOT EXISTS device_limit INTEGER;"

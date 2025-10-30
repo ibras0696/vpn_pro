@@ -35,7 +35,11 @@ def test_main_starts_polling(monkeypatch) -> None:
 
     monkeypatch.setattr(main, "Dispatcher", lambda: dispatcher)
     monkeypatch.setattr(main, "Bot", DummyBot)
-    monkeypatch.setattr(main, "AdminAccessMiddleware", lambda admin_id: f"mw:{admin_id}")
+    monkeypatch.setattr(
+        main,
+        "AdminAccessMiddleware",
+        lambda admin_id, allowed_commands=None: f"mw:{admin_id}",
+    )
     monkeypatch.setattr(
         main,
         "get_settings",
@@ -47,4 +51,4 @@ def test_main_starts_polling(monkeypatch) -> None:
     assert dispatcher.start_polling.await_count == 1
     assert dispatcher.message_middlewares == ["mw:99"]
     assert dispatcher.callback_middlewares == ["mw:99"]
-    assert len(dispatcher.routers) >= 2
+    assert len(dispatcher.routers) >= 3
