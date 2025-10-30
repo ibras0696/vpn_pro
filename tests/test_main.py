@@ -20,9 +20,9 @@ class DummyDispatcher:
 
 
 class DummyBot:
-    def __init__(self, token: str, parse_mode: object) -> None:
+    def __init__(self, token: str, default=None) -> None:
         self.token = token
-        self.parse_mode = parse_mode
+        self.default = default
 
 
 def test_main_starts_polling(monkeypatch) -> None:

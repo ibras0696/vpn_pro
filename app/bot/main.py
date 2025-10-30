@@ -3,6 +3,7 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from loguru import logger
 
@@ -16,7 +17,7 @@ async def main() -> None:
     """Инициализировать бота и запустить долгий поллинг."""
 
     settings = get_settings()
-    bot = Bot(token=settings.bot_token, parse_mode=ParseMode.HTML)
+    bot = Bot(token=settings.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dispatcher = Dispatcher()
 
     dispatcher.include_router(admin_router)
