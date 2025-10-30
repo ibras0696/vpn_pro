@@ -3,8 +3,9 @@ POETRY ?= poetry
 PYTHON ?= python3
 DOCKER_COMPOSE ?= docker compose
 PROJECT_ROOT := $(shell pwd)
+UBUNTU_SETUP_OUTPUT ?= ubuntu22_setup.sh
 
-.PHONY: init up down restart ps logs lint fmt test coverage clean clean-docker setup-server
+.PHONY: init up down restart ps logs lint fmt test coverage clean clean-docker setup-server ubuntu-setup-script
 
 init:
 	@cp -n .env.example .env || true
@@ -47,3 +48,8 @@ clean-docker:
 
 setup-server:
 	@$(PROJECT_ROOT)/scripts/setup_server.sh
+
+ubuntu-setup-script:
+	@cp $(PROJECT_ROOT)/scripts/setup_ubuntu22.sh $(PROJECT_ROOT)/$(UBUNTU_SETUP_OUTPUT)
+	@chmod +x $(PROJECT_ROOT)/$(UBUNTU_SETUP_OUTPUT)
+	@echo "Скрипт сохранён в $(UBUNTU_SETUP_OUTPUT)"

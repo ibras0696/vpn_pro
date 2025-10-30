@@ -21,8 +21,16 @@
 - `make clean` — удалить кэш и временные файлы проекта.
 - `make clean-docker` — остановить и очистить docker-тома.
 - `make setup-server` — обновить систему, установить Docker/Poetry и заранее загрузить базовые образы.
+- `make ubuntu-setup-script` — создать локальный скрипт `ubuntu22_setup.sh` для ручного запуска.
 
 ### Как запустить скрипт вручную
 1. Убедитесь, что файл исполняемый: `chmod +x scripts/setup_server.sh`.
 2. Выполните `./scripts/setup_server.sh` или `bash scripts/setup_server.sh`.
 3. После завершения при необходимости перелогиньтесь, чтобы активировать группу `docker`.
+
+Альтернатива для Ubuntu 22:
+
+```bash
+make ubuntu-setup-script
+./ubuntu22_setup.sh
+```
