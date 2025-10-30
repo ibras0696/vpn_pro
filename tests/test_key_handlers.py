@@ -11,8 +11,10 @@ class DummyMessage:
         self.texts: list[str] = []
         self.documents: list[tuple[object, str | None]] = []
 
-    async def answer(self, text: str) -> None:
+    async def answer(self, text: str, reply_markup=None) -> None:
         self.texts.append(text)
+        if reply_markup is not None:
+            self.documents.append((reply_markup, None))
 
     async def answer_document(self, document: object, caption: str | None = None) -> None:
         self.documents.append((document, caption))
@@ -120,6 +122,68 @@ def test_handle_delete_key_without_uuid(monkeypatch) -> None:
 def test_handle_delete_prompt(monkeypatch) -> None:
     callback = DummyCallback(data="delete_key")
 
+    monkeypatch.setattr(key_management, "_fetch_keys", AsyncMock(return_value=[SimpleNamespace(uuid="u1", email="test@example.com")]))
+
     asyncio.run(key_management.handle_delete_prompt(callback))
 
+    assert callback.message.texts[0].startswith("Выберите ключ")
+    callback.answer.assert_called_once()
+
+
+def test_handle_delete_prompt_no_keys(monkeypatch) -> None:
+    callback = DummyCallback(data="delete_key")
+
+    monkeypatch.setattr(key_management, "_fetch_keys", AsyncMock(return_value=[]))
+
+    asyncio.run(key_management.handle_delete_prompt(callback))
+
+    callback.answer.assert_called_with("Ключи отсутствуют", show_alert=True)
+
+
+def test_handle_list_keys(monkeypatch) -> None:
+    callback = DummyCallback(data="list_keys")
+
+    monkeypatch.setattr(
+        key_management,
+        "_fetch_keys",
+        AsyncMock(
+            return_value=[
+                SimpleNamespace(uuid="u1", email="mail1"),
+                SimpleNamespace(uuid="u2", email=None),
+            ]
+        ),
+    )
+
+    asyncio.run(key_management.handle_list_keys(callback))
+
+    assert "Список ключей" in callback.message.texts[0]
+    callback.answer.assert_called_once()
+
+
+def test_handle_list_keys_empty(monkeypatch) -> None:
+    callback = DummyCallback(data="list_keys")
+
+    monkeypatch.setattr(key_management, "_fetch_keys", AsyncMock(return_value=[]))
+
+    asyncio.run(key_management.handle_list_keys(callback))
+
+    callback.answer.assert_called_with("Ключей пока нет", show_alert=True)
+
+
+def test_handle_settings(monkeypatch) -> None:
+    callback = DummyCallback(data="settings")
+
+    monkeypatch.setattr(
+        key_management,
+        "get_settings",
+        lambda: SimpleNamespace(
+            xray_config_path="/app/xray.json",
+            xray_host="example.com",
+            xray_port=443,
+        ),
+    )
+
+    asyncio.run(key_management.handle_settings(callback))
+
+    assert callback.message.texts[0].startswith("⚙️ Настройки")
     callback.answer.assert_called_once()

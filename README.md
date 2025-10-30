@@ -86,7 +86,10 @@ python3 -m coverage report
 ## 🐳 Docker-окружение
 - `docker/Dockerfile.bot` — образ бота (Poetry + Aiogram + приложения);
 - `docker/Dockerfile.postgres` — PostgreSQL с инициализацией;
+- `docker/xray/config.json` — пример конфига XRay с пустым списком клиентов;
 - `docker-compose.yml` — бот и база, readiness-healthcheck, volume хранения.
+
+> Перед запуском укажите реальные параметры XRay в `docker/xray/config.json` и/или в `.env` переменную `XRAY_CONFIG_PATH`.
 
 ## 🗂️ Структура проекта
 ```text

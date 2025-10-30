@@ -22,6 +22,7 @@
 - `make clean-docker` — остановить и очистить docker-тома.
 - `make setup-server` — обновить систему, установить Docker/Poetry и заранее загрузить базовые образы.
 - `make ubuntu-setup-script` — создать локальный скрипт `ubuntu24_setup.sh` для ручного запуска.
+- Отредактируйте `docker/xray/config.json`, чтобы в конфиге присутствовали реальные inbound-параметры XRay.
 
 ### Как запустить скрипт вручную
 1. Убедитесь, что файл исполняемый: `chmod +x scripts/setup_server.sh`.
