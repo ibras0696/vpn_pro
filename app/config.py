@@ -1,7 +1,13 @@
 """Конфигурация приложения и загрузка переменных окружения."""
 
 from functools import lru_cache
+from pathlib import Path
+
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(_PROJECT_ROOT / ".env")
 
 
 class Settings(BaseSettings):
